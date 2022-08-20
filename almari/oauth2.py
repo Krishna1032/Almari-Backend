@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from .config import settings
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
-from . import database, models
+from . import database, models, schema
 from sqlalchemy.orm import Session
 
 
@@ -23,19 +23,13 @@ def create_access_token(data:dict):
 
     return encoded_jwt
 
-from pydantic import BaseModel
-from typing import Optional
-class Tokendata(BaseModel):
-    id: Optional [str] = None
-
-
 def verify_access_token(token:str, credentials_exception):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id:str =  payload.get("user_id")
         if id is None:
             raise credentials_exception
-        token_data = Tokendata(id=id)
+        token_data = schema.Tokendata(id=id)
 
     except JWTError:
         raise credentials_exception

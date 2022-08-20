@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import Optional
 
 
 #schema for users
@@ -19,3 +20,6 @@ class ReturnUser(BaseModel):
 class Token(BaseModel):
     access_token:str
     token_type: str
+
+class Tokendata(BaseModel):
+    id: Optional [str] = None
