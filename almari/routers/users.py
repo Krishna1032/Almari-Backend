@@ -19,6 +19,7 @@ def create_user(user: schema.SignupModel, db: Session = Depends(database.get_db)
     db.refresh(new_user)
     return new_user
 
+
 @router.get('/{id}', response_model= schema.ReturnUser)
 def get_user(id:int, db: Session = Depends(database.get_db)):
     user = db.query(models.Users).filter(models.Users.id == id).first()
