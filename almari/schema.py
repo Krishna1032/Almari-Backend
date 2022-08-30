@@ -23,3 +23,24 @@ class Token(BaseModel):
 
 class Tokendata(BaseModel):
     id: Optional [str] = None
+
+
+class PostBase(BaseModel):
+    category: str
+    title: str
+    description: str
+    post_img: str
+    
+class PostCreate(PostBase):
+    pass
+
+class Post(PostBase):
+    id: int
+    owner_id: int
+    created_at: datetime
+    owner: ReturnUser
+
+    class Config: #converts sequel alchemy model into pydantic model
+        orm_mode = True
+
+
