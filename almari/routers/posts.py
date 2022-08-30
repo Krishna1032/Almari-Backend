@@ -7,6 +7,8 @@ router = APIRouter(
     prefix="/posts",
     tags = ['Posts']
 )
+
+# create post 
 @router.post("/", status_code = status.HTTP_201_CREATED)
 def createpost(post: schema.PostCreate,  db: Session = Depends(database.get_db), 
                 current_user: int = Depends(oauth2.get_current_user)): 
@@ -19,6 +21,7 @@ def createpost(post: schema.PostCreate,  db: Session = Depends(database.get_db),
     return new_post
 
 
+# delete a post
 @router.delete("/{id}", status_code = status.HTTP_204_NO_CONTENT)
 def delete_post(id: int,  db : Session = Depends(database.get_db), 
                 current_user: int = Depends(oauth2.get_current_user)):
@@ -33,7 +36,9 @@ def delete_post(id: int,  db : Session = Depends(database.get_db),
     db.commit()
     return Response(status_code = status.HTTP_204_NO_CONTENT) #in delete we usually don't return anything so only the response is given
 
-@router.put("/{id}", response_model= schema.Post)
+
+# update a post
+@router.put("/{id}", response_model= schema.PostOut)
 def update_post(id: int, updated_post: schema.PostCreate, db: Session = Depends(database.get_db),
 current_user: int = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Posts).filter(models.Posts.id == id)
@@ -50,12 +55,15 @@ current_user: int = Depends(oauth2.get_current_user)):
     return post_query.first()
 
 
-@router.get("/", status_code = status.HTTP_200_OK, response_model= List[schema.Post])
+# get all posts
+@router.get("/", status_code = status.HTTP_200_OK, response_model= List[schema.PostOut])
 def getAllPosts(db: Session = Depends(database.get_db)):
     posts = db.query(models.Posts).all()
     return posts
 
-@router.get("/{id}", status_code = status.HTTP_200_OK, response_model= schema.Post)
+
+# get one post
+@router.get("/{id}", status_code = status.HTTP_200_OK, response_model= schema.PostOut)
 def getOnePost(id: int, db: Session = Depends(database.get_db)):
     post = db.query(models.Posts).filter(models.Posts.id == id).first()
     if not post:
