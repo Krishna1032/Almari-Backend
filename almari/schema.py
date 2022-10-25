@@ -16,6 +16,9 @@ class ReturnUser(BaseModel):
     class Config: 
         orm_mode = True
 
+
+
+
 #schema for token
 class Token(BaseModel):
     access_token:str
@@ -25,6 +28,9 @@ class Tokendata(BaseModel):
     id: Optional [str] = None
 
 
+
+
+# schema for posts
 class PostBase(BaseModel):
     category: str
     title: str

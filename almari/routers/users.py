@@ -7,9 +7,10 @@ router = APIRouter(
     tags = ["User"],
 )
 
-
+# create user
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model= schema.ReturnUser)
 def create_user(user: schema.SignupModel, db: Session = Depends(database.get_db) ):
+    
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
 
@@ -20,8 +21,10 @@ def create_user(user: schema.SignupModel, db: Session = Depends(database.get_db)
     return new_user
 
 
+# get user
 @router.get('/{id}', response_model= schema.ReturnUser)
 def get_user(id:int, db: Session = Depends(database.get_db)):
+
     user = db.query(models.Users).filter(models.Users.id == id).first()
     if not user:
         raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail = 
