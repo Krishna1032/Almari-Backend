@@ -8,11 +8,16 @@ router = APIRouter(
     tags = ['Posts']
 )
 
+
+# static file setup config
+
+
 # create post 
 @router.post("/", status_code = status.HTTP_201_CREATED)
-def createpost(post: schema.PostCreate,  db: Session = Depends(database.get_db), 
-                current_user: int = Depends(oauth2.get_current_user)): 
-    print (post)   
+def createpost(post: schema.PostCreate, db: Session = Depends(database.get_db), 
+                current_user: int = Depends(oauth2.get_current_user)):
+ 
+    FILEPATH = "./images"
     new_post = models.Posts(owner_id = current_user.id, **post.dict())
     db.add(new_post)
     db.commit()
@@ -25,6 +30,7 @@ def createpost(post: schema.PostCreate,  db: Session = Depends(database.get_db),
 @router.delete("/{id}", status_code = status.HTTP_204_NO_CONTENT)
 def delete_post(id: int,  db : Session = Depends(database.get_db), 
                 current_user: int = Depends(oauth2.get_current_user)):
+
     post_query = db.query(models.Posts).filter(models.Posts.id == id)
     post = post_query.first()
     if post == None:

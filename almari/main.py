@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, status
 from .database import engine
+from . import models
 from .routers import login, users, posts
 from fastapi.middleware.cors import CORSMiddleware
 
 
 origins =["*"]
-# models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
