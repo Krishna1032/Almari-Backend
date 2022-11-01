@@ -35,7 +35,6 @@ class PostBase(BaseModel):
     category: str
     title: str
     description: str
-    post_img: str
     
 class PostCreate(PostBase):
     pass

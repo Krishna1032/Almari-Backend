@@ -1,6 +1,9 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Response
+import shutil
+from fastapi import APIRouter, File, HTTPException, UploadFile, status, Depends, Response
 from sqlalchemy.orm import Session
-from .. import database, models, oauth2, schema
+from .. import database, models, oauth2, schema, utils
+import secrets
+from PIL import Image
 from typing import List, Optional
 
 router = APIRouter(
@@ -14,11 +17,21 @@ router = APIRouter(
 
 # create post 
 @router.post("/", status_code = status.HTTP_201_CREATED)
-def createpost(post: schema.PostCreate, db: Session = Depends(database.get_db), 
-                current_user: int = Depends(oauth2.get_current_user)):
- 
-    FILEPATH = "./images"
-    new_post = models.Posts(owner_id = current_user.id, **post.dict())
+def createpost(post: schema.PostCreate = Depends(), db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user), file:UploadFile = File(...)):
+
+    filename = file.filename
+    extension = filename.split(".")[1]
+
+    if extension not in ["png", "jpg"]:
+        return {"status": "error", "detail": "File extension not allowed"}
+    
+    token_name = secrets.token_hex(10) + "." + extension
+    url = str("images/" + token_name)
+
+    with open(url, "wb") as image:
+        shutil.copyfileobj(file.file, image)
+
+    new_post = models.Posts(owner_id = current_user.id, post_img = url, **(post.dict()))
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
