@@ -3,7 +3,6 @@ from fastapi import APIRouter, File, HTTPException, UploadFile, status, Depends,
 from sqlalchemy.orm import Session
 from .. import database, models, oauth2, schema, utils
 import secrets
-from PIL import Image
 from typing import List, Optional
 
 router = APIRouter(

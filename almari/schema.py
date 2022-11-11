@@ -5,12 +5,16 @@ from typing import Optional
 
 #schema for users
 class SignupModel(BaseModel):
+    name: str
+    phone_number: str
     email: EmailStr
     password: str
 
 class ReturnUser(BaseModel):
     id:int
     email: EmailStr
+    name: str
+    phone_number: str
     created_at: datetime
 
     class Config: 
