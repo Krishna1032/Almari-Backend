@@ -21,8 +21,6 @@ class ReturnUser(BaseModel):
         orm_mode = True
 
 
-
-
 #schema for token
 class Token(BaseModel):
     access_token:str
@@ -32,13 +30,15 @@ class Tokendata(BaseModel):
     id: Optional [str] = None
 
 
-
-
 # schema for posts
 class PostBase(BaseModel):
     category: str
     title: str
     description: str
+    price: int
+
+    class Config: #converts sequel alchemy model into pydantic model
+        orm_mode = True
     
 class PostCreate(PostBase):
     pass
@@ -49,7 +49,23 @@ class PostOut(PostBase):
     created_at: datetime
     owner: ReturnUser
 
-    class Config: #converts sequel alchemy model into pydantic model
+    
+
+
+#schema for cart
+class CartBase(BaseModel):
+    quantity: int
+
+    class Config:
         orm_mode = True
 
+class CartAdd(CartBase):
+    pass
 
+class CartOut(CartBase):
+    id: int
+    owner_id: int
+    product_id: int
+    product: PostBase
+
+   

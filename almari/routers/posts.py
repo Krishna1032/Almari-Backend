@@ -15,7 +15,7 @@ router = APIRouter(
 
 
 # create post 
-@router.post("/", status_code = status.HTTP_201_CREATED)
+@router.post("/", status_code = status.HTTP_201_CREATED, response_model= schema.PostOut)
 def createpost(post: schema.PostCreate = Depends(), db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user), file:UploadFile = File(...)):
 
     filename = file.filename
