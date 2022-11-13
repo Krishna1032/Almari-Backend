@@ -44,6 +44,7 @@ class PostCreate(PostBase):
     pass
 
 class PostOut(PostBase):
+    post_img:str
     id: int
     owner_id: int
     created_at: datetime

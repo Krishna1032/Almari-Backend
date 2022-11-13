@@ -3,6 +3,7 @@ from .database import engine
 from . import models
 from .routers import login, users, posts, cart
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -16,6 +17,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory = "static"), name = "static") 
 
 @app.get("/", status_code= status.HTTP_200_OK)
 def greeting():
