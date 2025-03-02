@@ -51,8 +51,6 @@ class PostOut(PostBase):
     owner: ReturnUser
 
     
-
-
 #schema for cart
 class CartBase(BaseModel):
     quantity: int
