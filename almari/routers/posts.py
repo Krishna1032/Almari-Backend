@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from .. import database, models, oauth2, schema, utils
 import secrets
 from typing import List, Optional
+import os
+
 
 router = APIRouter(
     prefix="/posts",
@@ -16,24 +18,31 @@ router = APIRouter(
 
 # create post 
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model= schema.PostOut)
-def createpost(post: schema.PostCreate = Depends(), db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user), file:UploadFile = File(...)):
+def createpost(post: schema.PostCreate = Depends(), db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user), file: List[UploadFile] =  File(...)):
+        
+    FILEPATH = "./static/images/"
+    urls = ''
+    for file in file:
+        filename = file.filename
+        extension = filename.split(".")[1]
 
-    filename = file.filename
-    extension = filename.split(".")[1]
+        if extension not in ["png", "jpg", "jpeg"]:
+            return {"status": "error", "detail": "File extension not allowed"}
+        
+        token_name = secrets.token_hex(10) + "." + extension
+        generated_name = FILEPATH + token_name
 
-    if extension not in ["png", "jpg"]:
-        return {"status": "error", "detail": "File extension not allowed"}
-    
-    token_name = secrets.token_hex(10) + "." + extension
-    url = str("images/" + token_name)
+        with open(generated_name, "wb") as image:
+            shutil.copyfileobj(file.file, image)
+        url = "localhost:8000" + generated_name[1:]
+        urls = urls +  url + ","  
 
-    with open(url, "wb") as image:
-        shutil.copyfileobj(file.file, image)
-
-    new_post = models.Posts(owner_id = current_user.id, post_img = url, **(post.dict()))
+    new_post = models.Posts(owner_id = current_user.id, post_img = urls, **(post.dict()))
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
+    print(new_post.post_img)
+    print(new_post.post_img[1])
     
     return new_post
 
@@ -49,6 +58,14 @@ def delete_post(id: int,  db : Session = Depends(database.get_db),
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail= f"Post with id:{id} not found")
     if post.owner_id != current_user.id:
         raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail = f"Not Authorized")
+
+    posts = post.post_img.split(",")
+    posts.pop()
+
+    for images in posts:
+        name = (images).split("/")
+        url = "./static/images/" + name[3]
+        os.remove(url)
 
     post_query.delete(synchronize_session = False)
     db.commit()
